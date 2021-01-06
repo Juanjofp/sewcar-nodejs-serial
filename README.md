@@ -1,1 +1,1 @@
-# decawave-connector
+# SewCar NodeJS Serial port communications
