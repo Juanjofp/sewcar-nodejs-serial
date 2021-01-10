@@ -1,6 +1,6 @@
 import SerialPort from 'serialport';
 
-export const getSewCarPort = async (vendor = '1a86', product = '7523') => {
+export const getSewCarPort = async (vendor = '10c4', product = 'ea60') => {
     try {
         const ports = await SerialPort.list();
         return ports.filter(port => {
@@ -35,27 +35,13 @@ export const startListenSewCar = (
                     port.on('error', error =>
                         console.log('Error data:', error)
                     );
-                    port.once('data', (data: Buffer) => {
-                        if (data.equals(Buffer.from([0x53, 0x45, 0x57]))) {
-                            // Send MAC
-                            setTimeout(() => {
-                                const macBuffer = Buffer.from([
-                                    0x01,
-                                    0x02,
-                                    0x03,
-                                    0x04,
-                                    0x05,
-                                    0x06
-                                ]);
-                                port.write(macBuffer);
-                                port.on('data', parser);
-                                resolve(port);
-                            });
-                        }
-                    });
                     port.on('close', error =>
                         console.log('Closing port', path, error)
                     );
+                    port.on('data', parser);
+                    console.log('REsolves');
+                    port.write('SEW');
+                    resolve(port);
                 } else {
                     console.log('Error opening', path, error);
                     reject(error);
@@ -73,5 +59,5 @@ export async function SewCar(parser: SewCarParser) {
         return Promise.reject(new Error('SewCar not found'));
     }
     console.log('SewCar Info', sewCarInfo);
-    return await startListenSewCar(sewCarInfo[0].path, parser);
+    return await startListenSewCar(sewCarInfo[1].path, parser);
 }
